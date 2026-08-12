@@ -1,0 +1,115 @@
+# Model registry -- the single source of truth for what the gateway can route to.
+#
+# Costs are US dollars per million tokens, exactly as the provider bills them.
+# The router, the cost estimator, and the savings report all read these numbers,
+# so a wrong value here quietly corrupts every downstream figure.
+#
+# `pricing_as_of` is a reminder that prices change. Re-check the provider pricing
+# pages against this file before quoting any number from the savings report.
+pricing_as_of: "2026-06-24"
+
+# The model every request is priced against in the savings report: "what if we
+# had sent everything to the strongest model?" Must be one of the models below.
+baseline_model: claude-opus-5
+
+models:
+  # --- Tier 1: extraction, formatting, simple classification -----------------
+  - name: claude-haiku-4-5
+    provider: anthropic
+    tier: 1
+    input_cost_per_mtok: 1.00
+    output_cost_per_mtok: 5.00
+    typical_latency_ms: 900
+    max_context_tokens: 200000
+    supports_vision: true
+    supports_tools: true
+
+  - name: gpt-4o-mini
+    provider: openai
+    tier: 1
+    input_cost_per_mtok: 0.15
+    output_cost_per_mtok: 0.60
+    typical_latency_ms: 800
+    max_context_tokens: 128000
+    supports_vision: true
+    supports_tools: true
+
+  - name: llama3.1:8b
+    provider: ollama
+    tier: 1
+    # Runs locally, so there is no per-token bill. Electricity and the GPU are
+    # real costs, but they are not per-request, so the honest figure here is 0.
+    input_cost_per_mtok: 0.0
+    output_cost_per_mtok: 0.0
+    typical_latency_ms: 1500
+    max_context_tokens: 128000
+    supports_vision: false
+    supports_tools: true
+
+  # --- Tier 2: summarization, rewriting, multi-step classification -----------
+  - name: claude-sonnet-5
+    provider: anthropic
+    tier: 2
+    # Introductory rate, in effect through 2026-08-31.
+    # Reverts to 3.00 / 15.00 -- update this file on that date.
+    input_cost_per_mtok: 2.00
+    output_cost_per_mtok: 10.00
+    typical_latency_ms: 2200
+    max_context_tokens: 1000000
+    supports_vision: true
+    supports_tools: true
+
+  - name: gpt-4o
+    provider: openai
+    tier: 2
+    input_cost_per_mtok: 2.50
+    output_cost_per_mtok: 10.00
+    typical_latency_ms: 2000
+    max_context_tokens: 128000
+    supports_vision: true
+    supports_tools: true
+
+  # --- Tier 3: reasoning, code generation, anything risky -------------------
+  - name: claude-opus-5
+    provider: anthropic
+    tier: 3
+    input_cost_per_mtok: 5.00
+    output_cost_per_mtok: 25.00
+    typical_latency_ms: 5000
+    max_context_tokens: 1000000
+    supports_vision: true
+    supports_tools: true
+
+  # --- Mock models: free, offline, deterministic ----------------------------
+  # Used by the test suite and the 1,000-prompt workload simulation. Their costs
+  # mirror the paid tiers above so the savings percentage the simulation reports
+  # reflects real provider economics rather than made-up numbers.
+  - name: mock-cheap
+    provider: mock
+    tier: 1
+    input_cost_per_mtok: 1.00
+    output_cost_per_mtok: 5.00
+    typical_latency_ms: 900
+    max_context_tokens: 200000
+    supports_vision: false
+    supports_tools: false
+
+  - name: mock-mid
+    provider: mock
+    tier: 2
+    input_cost_per_mtok: 2.00
+    output_cost_per_mtok: 10.00
+    typical_latency_ms: 2200
+    max_context_tokens: 1000000
+    supports_vision: false
+    supports_tools: false
+
+  - name: mock-strong
+    provider: mock
+    tier: 3
+    input_cost_per_mtok: 5.00
+    output_cost_per_mtok: 25.00
+    typical_latency_ms: 5000
+    max_context_tokens: 1000000
+    supports_vision: false
+    supports_tools: false

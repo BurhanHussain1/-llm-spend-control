@@ -10,7 +10,13 @@ psycopg[binary]>=3.2        # only used when DATABASE_URL points at Postgres
 redis>=5.2                  # only used when REDIS_URL is set
 
 # --- providers ---
-httpx>=0.27
+anthropic>=0.40             # official SDK, used by the Anthropic adapter
+openai>=1.60,<3             # official SDK, used by the OpenAI adapter.
+                            # Pinned below 3.0: that release moved to `httpx2`,
+                            # which would put a second HTTP stack in the runtime
+                            # alongside the one anthropic and httpx already use,
+                            # and which respx cannot intercept in tests.
+httpx>=0.27                 # Ollama adapter (no SDK dependency needed)
 tiktoken>=0.8               # token counting for pre-call cost estimates
 
 # --- config ---
@@ -22,4 +28,5 @@ pandas>=2.2
 
 # --- tests ---
 pytest>=8.3
+pytest-asyncio>=0.24        # the provider adapters are async
 respx>=0.21                 # mocks httpx calls, so provider tests never hit the network
