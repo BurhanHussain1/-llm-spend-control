@@ -15,7 +15,7 @@ handle it, and blocks requests before the money is spent when a budget runs out.
 ```bash
 pip install -r requirements.txt
 python -m scripts.simulate_workload    # 1,000 requests, no API keys, ~30 seconds
-streamlit run dashboard/app.py         # then look at the Savings tab
+streamlit run dashboard/cost_dashboard.py         # then look at the Savings tab
 ```
 
 ## The problem
@@ -78,6 +78,43 @@ instead, and says so:
 That is the whole design in two responses: cheap when it can be, strong when
 correctness matters, and never silent about which.
 
+## The dashboard
+
+`streamlit run dashboard/cost_dashboard.py` — four tabs, every figure traced back
+to a query in `app/reporting.py`. These are real screenshots of the 1,000-request
+simulation.
+
+### Savings — the counterfactual, with its own operating cost subtracted
+
+![Savings tab: baseline $6.10, total spend $5.17, net saving 15.2%, and a daily actual-vs-baseline chart](docs/screenshots/02-savings.png)
+
+The table is the argument: **gross saving 19.9%, net saving 15.2%.** Escalation and
+verification are broken out rather than folded into routed spend, because both cost
+real money. A system that saves 70% while spending 40% checking itself has not
+saved 70%.
+
+### Spend — who is spending, on what, and where it is heading
+
+![Spend tab: spend by team, feature and model, month-end projections, and the most expensive individual requests](docs/screenshots/01-spend.png)
+
+Note the model table: `mock-strong` takes 498 of 1,032 provider calls but
+**$4.48 of $5.17** — the tier-3 concentration that caps the savings ceiling.
+
+### Routing quality — the pass rate, and what produced it
+
+![Routing quality tab: verifier pass rate, graded checks, escalation rate, tier distribution, and routing misses](docs/screenshots/03-routing-quality.png)
+
+The pass rate ships with its caveat attached: with no API key the judge is
+mechanical, so it detects empty and truncated answers and cannot assess
+correctness. The warning is rendered by the app, not written into the README.
+
+### Ops — latency, provider outcomes, budget headroom
+
+![Ops tab: p50 and p95 latency by model, outcomes by provider, and budget usage per team](docs/screenshots/04-ops.png)
+
+Budget-blocked requests are counted separately from provider errors: a request
+refused by a budget never reached a provider and should not count against it.
+
 ## Design decisions
 
 | Decision | Why |
@@ -120,7 +157,7 @@ pytest                              # 197 tests, all offline
 python -m eval.classifier_eval      # classifier accuracy, calibration vs holdout
 python -m scripts.simulate_workload # 1,000 requests -> reports/savings_report.md
 uvicorn app.main:app --reload       # gateway on :8000
-streamlit run dashboard/app.py      # dashboard on :8501
+streamlit run dashboard/cost_dashboard.py      # dashboard on :8501
 ```
 
 No API keys needed. The mock provider produces realistic token counts and latency,

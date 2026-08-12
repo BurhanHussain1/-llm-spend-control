@@ -84,7 +84,7 @@ llm-spend-control/
 │     ├─ models.py              # SQLAlchemy tables
 │     └─ repository.py          # every DB read/write lives here
 │
-├─ dashboard/app.py             # Streamlit cost dashboard
+├─ dashboard/cost_dashboard.py             # Streamlit cost dashboard
 ├─ eval/
 │  ├─ labeled_prompts.jsonl     # ~120 hand-labeled tier examples
 │  └─ classifier_eval.py        # accuracy + cost of misroutes
@@ -308,7 +308,7 @@ break the user's request.
 
 **Goal:** the screenshots that go in the README.
 
-Build `app/reporting.py` (all queries, one function each) and `dashboard/app.py`
+Build `app/reporting.py` (all queries, one function each) and `dashboard/cost_dashboard.py`
 (Streamlit, four tabs, thin — presentation only, zero logic):
 
 1. **Spend** — daily cost by team and feature, month-to-date, end-of-month projection,

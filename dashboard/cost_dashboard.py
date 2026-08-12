@@ -2,7 +2,7 @@
 
 Run it:
 
-    streamlit run dashboard/app.py
+    streamlit run dashboard/cost_dashboard.py
 
 Presentation only. Every figure on screen comes from ``app/reporting.py`` or
 ``app/db/repository.py``, so nothing can be computed one way here and another way
