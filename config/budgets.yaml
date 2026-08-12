@@ -1,0 +1,37 @@
+# Budget limits, in US dollars.
+#
+# Resolution order for a request: a feature-level limit if one exists, otherwise
+# the team's limit, otherwise `defaults`. Feature limits are checked *in addition
+# to* the team limit, not instead of it -- a feature cannot spend its way past
+# its team's cap.
+#
+# Periods roll over at midnight UTC and on the first of the month, UTC.
+
+defaults:
+  daily_limit_usd: 10.00
+  monthly_limit_usd: 200.00
+
+teams:
+  search:
+    daily_limit_usd: 25.00
+    monthly_limit_usd: 500.00
+    features:
+      # Autocomplete fires on every keystroke, so it gets its own tighter cap:
+      # a bug there could exhaust the whole team's daily budget in minutes.
+      autocomplete:
+        daily_limit_usd: 5.00
+        monthly_limit_usd: 100.00
+
+  support:
+    daily_limit_usd: 40.00
+    monthly_limit_usd: 800.00
+
+  billing:
+    # Small budget on purpose: this team's traffic is low-volume and
+    # high-stakes, so its requests are expected to route to strong models.
+    daily_limit_usd: 8.00
+    monthly_limit_usd: 150.00
+
+  analytics:
+    daily_limit_usd: 15.00
+    monthly_limit_usd: 300.00
