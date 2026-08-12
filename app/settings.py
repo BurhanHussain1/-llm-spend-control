@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
     ollama_base_url: str = "http://localhost:11434"
+
+    enable_ollama: bool = False
+    """Ollama needs no API key, so it cannot be detected the way the paid
+    providers are -- it has to be turned on explicitly."""
+
     default_provider: str = "mock"
     """Provider used when a model has no credentials. Empty string = hard error."""
 

@@ -35,7 +35,16 @@ MAX_TIER = 3
 
 
 class RoutingError(RuntimeError):
-    """No model can serve this request."""
+    """No model can serve this request. The gateway maps this to a 503."""
+
+
+class PreferenceError(RoutingError):
+    """The caller named a model that cannot serve this request.
+
+    Distinct from :class:`RoutingError` because the fault is in the request, not
+    in our capacity -- the gateway maps this to a 400 so the caller knows to
+    change something rather than retry.
+    """
 
 
 @dataclass(frozen=True)
@@ -210,13 +219,13 @@ class Router:
         model = self._registry.get(name)  # raises RegistryError if unknown
 
         if model.provider not in self._available:
-            raise RoutingError(
+            raise PreferenceError(
                 f"requested model {name!r} needs provider {model.provider!r}, "
                 f"which is not configured. Reachable providers: "
                 f"{sorted(self._available) or 'none'}"
             )
         if input_tokens and input_tokens > model.max_context_tokens:
-            raise RoutingError(
+            raise PreferenceError(
                 f"requested model {name!r} has a {model.max_context_tokens}-token "
                 f"context window, but this prompt is {input_tokens} tokens"
             )
