@@ -1,0 +1,25 @@
+# --- API gateway ---
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+
+# --- storage ---
+SQLAlchemy>=2.0
+psycopg[binary]>=3.2        # only used when DATABASE_URL points at Postgres
+redis>=5.2                  # only used when REDIS_URL is set
+
+# --- providers ---
+httpx>=0.27
+tiktoken>=0.8               # token counting for pre-call cost estimates
+
+# --- config ---
+PyYAML>=6.0
+
+# --- dashboard ---
+streamlit>=1.40
+pandas>=2.2
+
+# --- tests ---
+pytest>=8.3
+respx>=0.21                 # mocks httpx calls, so provider tests never hit the network

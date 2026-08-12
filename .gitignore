@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Environment
+.env
+
+# Local data
+data/
+*.db
+*.sqlite3
+
+# Generated output (keep the folder, drop the contents)
+reports/*
+!reports/.gitkeep
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
