@@ -13,9 +13,12 @@ data/
 *.db
 *.sqlite3
 
-# Generated output (keep the folder, drop the contents)
+# Generated output. The savings report is committed on purpose -- it is the
+# project's headline evidence, and a reviewer should be able to read it without
+# running anything. The database and the per-request CSV are regenerated data.
 reports/*
 !reports/.gitkeep
+!reports/savings_report.md
 
 # Tooling
 .pytest_cache/

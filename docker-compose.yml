@@ -1,0 +1,76 @@
+# The production shape: Postgres for durable usage records, Redis for atomic
+# budget counters, and the gateway plus dashboard sharing one image.
+#
+#   docker compose up --build
+#
+#   gateway    http://localhost:8000/health
+#   dashboard  http://localhost:8501
+#
+# Nothing in the application changes between this and a bare `uvicorn` run --
+# DATABASE_URL and REDIS_URL are the only difference, which is the point.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: llmops
+      POSTGRES_PASSWORD: llmops
+      POSTGRES_DB: llmops
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # The gateway creates tables on startup, so it must not start before
+      # Postgres is actually accepting connections.
+      test: ["CMD-SHELL", "pg_isready -U llmops -d llmops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  gateway:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://llmops:llmops@postgres:5432/llmops
+      REDIS_URL: redis://redis:6379/0
+      # Provider keys are optional. Without them the gateway serves traffic on
+      # the mock provider, which is what makes this stack runnable as-is.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SHADOW_SAMPLE_RATE: ${SHADOW_SAMPLE_RATE:-0.02}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  dashboard:
+    build: .
+    command:
+      - streamlit
+      - run
+      - dashboard/app.py
+      - --server.port=8501
+      - --server.address=0.0.0.0
+      - --server.headless=true
+      - --browser.gatherUsageStats=false
+    ports:
+      - "8501:8501"
+    environment:
+      # Read-only view of the same data. No REDIS_URL: the dashboard reads spend
+      # from the usage log, so it never needs the live counters.
+      DATABASE_URL: postgresql+psycopg://llmops:llmops@postgres:5432/llmops
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
