@@ -71,7 +71,7 @@ class Repository:
         cost_usd: float = 0.0,
         estimated_cost_usd: float = 0.0,
         baseline_cost_usd: float = 0.0,
-        escalated: bool = False,
+        kind: str = "primary",
         prompt: str = "",
         error: str | None = None,
         created_at: datetime | None = None,
@@ -97,7 +97,7 @@ class Repository:
             cost_usd=cost_usd,
             estimated_cost_usd=estimated_cost_usd,
             baseline_cost_usd=baseline_cost_usd,
-            escalated=escalated,
+            kind=kind,
             prompt_preview=prompt[:PROMPT_PREVIEW_CHARS],
             error=error,
         )
@@ -135,7 +135,7 @@ class Repository:
         prompt: str,
         chosen_model: str,
         better_model: str,
-        passed: bool,
+        passed: bool | None,
         score: float | None = None,
         reason: str = "",
         usage_event_id: int | None = None,
@@ -144,6 +144,8 @@ class Repository:
 
         Passing checks are stored as well as failures -- the verifier pass rate
         needs a denominator, and a table of only failures cannot provide one.
+        Pass ``passed=None`` when the check could not be run; those rows are
+        excluded from the pass rate rather than counted against it.
         """
         check = RoutingMiss(
             prompt=prompt,

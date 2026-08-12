@@ -96,8 +96,20 @@ class UsageEvent(Base):
     """What this call would have cost on the registry's baseline model. Stored
     per row so savings are a query over data, not a spreadsheet afterwards."""
 
-    escalated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    """True on the stronger rerun of a request that was escalated."""
+    kind: Mapped[str] = mapped_column(String(16), default="primary", nullable=False)
+    """``primary`` | ``escalation`` | ``shadow``.
+
+    Three kinds of call reach a provider, and they must be tellable apart because
+    only the first is the routing decision under test:
+
+    * ``primary`` -- the routed call.
+    * ``escalation`` -- a stronger rerun after the primary answer looked unusable.
+    * ``shadow`` -- an offline comparison against a stronger model.
+
+    All three cost real money and all three count against budgets. Lumping them
+    together would let verification overhead masquerade as routed spend and
+    quietly inflate the savings figure.
+    """
 
     prompt_preview: Mapped[str] = mapped_column(Text, default="", nullable=False)
     """First few hundred characters of the prompt, for the "most expensive
@@ -171,9 +183,16 @@ class RoutingMiss(Base):
     chosen_model: Mapped[str] = mapped_column(String(64), nullable=False)
     better_model: Mapped[str] = mapped_column(String(64), nullable=False)
 
-    passed: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    """False for a genuine miss. Passing checks are stored too, because the
-    verifier pass rate needs a denominator."""
+    passed: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    """True, False, or NULL.
+
+    Passing checks are stored as well as failures, because the verifier pass rate
+    needs a denominator. NULL means the check was *not run* -- the reference model
+    was unreachable, or the verification itself was refused by the budget. Those
+    are deliberately not counted as failures: a skipped check says nothing about
+    quality, and scoring it as a miss would understate the pass rate for reasons
+    that have nothing to do with the answer.
+    """
 
     score: Mapped[float | None] = mapped_column(Float, nullable=True)
     reason: Mapped[str] = mapped_column(Text, default="", nullable=False)

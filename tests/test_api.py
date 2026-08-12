@@ -237,11 +237,26 @@ def test_an_override_is_recorded_in_the_ledger(client):
     session = get_session_factory()()
     try:
         repo = Repository(session)
-        event = next(e for e in repo.recent_events() if e.status == "ok")
-        actions = [entry.action for entry in repo.ledger_for_event(event.id)]
+        primary = next(
+            e for e in repo.recent_events() if e.status == "ok" and e.kind == "primary"
+        )
+        actions = [entry.action for entry in repo.ledger_for_event(primary.id)]
         assert "override" in actions
     finally:
         session.close()
+
+
+def test_an_override_does_not_also_trigger_an_escalation(client):
+    """Overriding a blown budget once is a decision; twice is a bug.
+
+    A high-priority request that punches through an exhausted budget must not
+    then spend a second time on a precautionary rerun. A *broken* answer would
+    still be escalated -- only the priority-based rerun is suppressed.
+    """
+    client.post("/v1/chat", json=payload(team_id="tiny", priority="high"))
+
+    events = read_events()
+    assert [e.kind for e in events] == ["primary"]
 
 
 # --- provider failure --------------------------------------------------------

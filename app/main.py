@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
@@ -77,6 +77,7 @@ app = FastAPI(
 @app.post("/v1/chat", response_model=ChatResponse)
 async def chat(
     request: ChatRequest,
+    background_tasks: BackgroundTasks,
     gateway: Gateway = Depends(get_gateway),
     repo: Repository = Depends(get_repository),
 ) -> ChatResponse:
@@ -85,8 +86,11 @@ async def chat(
     The response reports the model chosen, why it was chosen, what it cost, and
     what it would have cost on the baseline model -- so a single call is enough
     to see the routing decision without reading the logs.
+
+    Shadow verification is handed to ``background_tasks`` so it runs after the
+    response has been sent. The caller never waits for us to check our own work.
     """
-    return await gateway.handle(request, repo)
+    return await gateway.handle(request, repo, schedule=background_tasks.add_task)
 
 
 @app.get("/v1/budgets/{team_id}", response_model=BudgetView)

@@ -27,7 +27,9 @@ from app.providers.base import Provider
 from app.providers.mock import MockProvider
 from app.providers.ollama_provider import OllamaProvider
 from app.providers.openai_provider import OpenAIProvider
-from app.registry import ModelRegistry
+from app.quality.judge import Judge, LLMJudge, MechanicalJudge
+from app.quality.shadow import ShadowVerifier
+from app.registry import Model, ModelRegistry
 from app.routing.router import Router, RoutingPolicy
 from app.settings import get_settings
 
@@ -99,12 +101,59 @@ def get_router() -> Router:
 
 
 @lru_cache
+def get_reference_model() -> Model:
+    """The strongest model we can actually reach.
+
+    Escalation targets and shadow verification both compare against this. It is
+    not necessarily the registry's baseline model: with no credentials configured,
+    the strongest *reachable* model is a mock one.
+    """
+    registry = get_registry()
+    reachable = [m for m in registry.all() if m.provider in get_providers()]
+    return registry.strongest(among=reachable)
+
+
+@lru_cache
+def get_judge() -> Judge:
+    """An LLM judge when a real provider can grade, a mechanical one otherwise.
+
+    The mechanical judge cannot assess correctness, only obvious defects, so the
+    choice is reported everywhere a pass rate appears.
+    """
+    model = get_reference_model()
+    if model.provider == "mock":
+        return MechanicalJudge()
+
+    return LLMJudge(
+        model=model,
+        provider=get_providers()[model.provider],
+        pass_threshold=get_settings().shadow_pass_threshold,
+    )
+
+
+@lru_cache
+def get_verifier() -> ShadowVerifier:
+    model = get_reference_model()
+    return ShadowVerifier(
+        registry=get_registry(),
+        reference_model=model,
+        provider=get_providers()[model.provider],
+        enforcer=get_enforcer(),
+        judge=get_judge(),
+    )
+
+
+@lru_cache
 def get_gateway() -> Gateway:
+    settings = get_settings()
     return Gateway(
         registry=get_registry(),
         router=get_router(),
         enforcer=get_enforcer(),
         providers=get_providers(),
+        verifier=get_verifier(),
+        shadow_sample_rate=settings.shadow_sample_rate,
+        escalate_high_priority=settings.escalate_on_high_priority,
     )
 
 
@@ -135,6 +184,9 @@ def reset_dependencies() -> None:
         get_enforcer,
         get_providers,
         get_router,
+        get_reference_model,
+        get_judge,
+        get_verifier,
         get_gateway,
     ):
         builder.cache_clear()

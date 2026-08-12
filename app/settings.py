@@ -53,8 +53,23 @@ class Settings(BaseSettings):
     budget_warn_threshold: float = 0.8
     """Fraction of budget that triggers a warning. Blocking always happens at 1.0."""
 
-    shadow_sample_rate: float = 0.1
-    """Fraction of cheap-model responses re-scored against the strongest model."""
+    shadow_sample_rate: float = 0.02
+    """Fraction of cheap-model responses re-scored against the strongest model.
+
+    Measured, not guessed. Verifying one tier-1 request costs about 25x what the
+    request itself cost: the reference model is priced ~5x higher *and* writes a
+    longer answer to the same prompt. At the 10% rate this originally used, that
+    works out to roughly 2.5x the routed cost of every tier-1 request -- which
+    would have cut reported savings from ~80% to ~31%, spending most of the
+    saving on measuring it.
+
+    2% keeps the overhead near 5% of routed spend while still yielding a few
+    hundred graded samples across a 1,000-request workload. The savings report
+    shows verification cost as its own line so this trade stays visible.
+    """
+
+    shadow_pass_threshold: float = 0.7
+    """Judge score at or above which a cheap answer counts as good enough."""
 
     escalate_on_high_priority: bool = True
 
