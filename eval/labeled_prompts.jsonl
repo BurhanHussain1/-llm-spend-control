@@ -1,0 +1,127 @@
+{"prompt": "Extract the invoice number from this email body: Ref INV-88412 dated 3 March.", "tier": 1}
+{"prompt": "Convert 2026-03-01 to a human readable date.", "tier": 1}
+{"prompt": "List the product SKUs mentioned: SKU-11, SKU-42, SKU-99.", "tier": 1}
+{"prompt": "Return the customer email address as JSON.", "tier": 1}
+{"prompt": "Classify this ticket as billing, technical, or account.", "tier": 1}
+{"prompt": "Tag the sentiment of this review as positive, negative, or neutral.", "tier": 1}
+{"prompt": "Reformat this postal address onto a single line.", "tier": 1}
+{"prompt": "Pull out every dollar amount in the paragraph below.", "tier": 1}
+{"prompt": "What is the total on this receipt?", "tier": 1}
+{"prompt": "Convert this list of names to CSV.", "tier": 1}
+{"prompt": "Extract the order date from the confirmation text.", "tier": 1}
+{"prompt": "Normalize these phone numbers to E.164 format.", "tier": 1}
+{"prompt": "Translate the phrase order shipped into Spanish.", "tier": 1}
+{"prompt": "Count how many times the word refund appears below.", "tier": 1}
+{"prompt": "Find the tracking number in this shipping notice.", "tier": 1}
+{"prompt": "Return the three field names from this JSON object as a bullet list.", "tier": 1}
+{"prompt": "Tag each line below as question or statement.", "tier": 1}
+{"prompt": "Extract the currency code from this transaction record.", "tier": 1}
+{"prompt": "What is the name of the account holder in this document?", "tier": 1}
+{"prompt": "Convert this timestamp to UTC.", "tier": 1}
+{"prompt": "List the email domains in the following addresses.", "tier": 1}
+{"prompt": "Format these numbers to two decimal places.", "tier": 1}
+{"prompt": "Extract all URLs from the text below.", "tier": 1}
+{"prompt": "Classify the language of this message.", "tier": 1}
+{"prompt": "Pull the postcode out of this address string.", "tier": 1}
+{"prompt": "Return the ticket priority field as json.", "tier": 1}
+{"prompt": "Parse this log line into fields.", "tier": 1}
+{"prompt": "Tag this transaction as refund or charge.", "tier": 1}
+{"prompt": "Extract the subscription plan name from the billing record.", "tier": 1}
+{"prompt": "List the column headers in this CSV row.", "tier": 1}
+{"prompt": "What is the invoice due date?", "tier": 1}
+{"prompt": "Convert this markdown table to csv.", "tier": 1}
+{"prompt": "Extract the coupon code from this message.", "tier": 1}
+{"prompt": "Tag whether this review mentions shipping.", "tier": 1}
+{"prompt": "Return the first and last name as separate json fields.", "tier": 1}
+{"prompt": "Find the percentage discount mentioned below.", "tier": 1}
+{"prompt": "Normalize this product title to title case.", "tier": 1}
+{"prompt": "Extract the last four digits of the card from the receipt.", "tier": 1}
+{"prompt": "Classify this email as spam or not spam.", "tier": 1}
+{"prompt": "List the country names appearing in this paragraph.", "tier": 1}
+{"prompt": "Extract the meeting time from this calendar invite.", "tier": 1}
+{"prompt": "Convert these weights from pounds to kilograms.", "tier": 1}
+{"prompt": "Summarize this support thread in three bullets.", "tier": 2}
+{"prompt": "Rewrite this paragraph for a non-technical audience.", "tier": 2}
+{"prompt": "Draft a two-sentence apology for the shipping delay.", "tier": 2}
+{"prompt": "Condense these release notes into a single changelog entry.", "tier": 2}
+{"prompt": "Categorize this ticket and give a one-line reason for the category.", "tier": 2}
+{"prompt": "Summarize the customer complaint and the action they are asking for.", "tier": 2}
+{"prompt": "Rewrite this error message so it is friendlier to end users.", "tier": 2}
+{"prompt": "Draft a reply confirming the refund has been issued.", "tier": 2}
+{"prompt": "Summarize this call transcript for the account manager.", "tier": 2}
+{"prompt": "Turn these bullet points into a short paragraph.", "tier": 2}
+{"prompt": "Paraphrase this policy clause in plain English.", "tier": 2}
+{"prompt": "Write a subject line for this outreach email.", "tier": 2}
+{"prompt": "Summarize what changed between these two documents.", "tier": 2}
+{"prompt": "Rewrite this product description to be under 50 words.", "tier": 2}
+{"prompt": "Draft a status update for the incident channel.", "tier": 2}
+{"prompt": "Summarize the top three themes across these reviews.", "tier": 2}
+{"prompt": "Rewrite this code comment so it explains the intent.", "tier": 2}
+{"prompt": "Categorize these tickets and group them by theme.", "tier": 2}
+{"prompt": "Draft onboarding instructions from these setup steps.", "tier": 2}
+{"prompt": "Summarize the payment terms in this contract.", "tier": 2}
+{"prompt": "Rewrite this to remove the jargon.", "tier": 2}
+{"prompt": "Compose a follow-up asking for the missing invoice.", "tier": 2}
+{"prompt": "Summarize this bug report for the engineering team.", "tier": 2}
+{"prompt": "Turn this changelog into a customer-facing announcement.", "tier": 2}
+{"prompt": "Draft a polite decline for this feature request.", "tier": 2}
+{"prompt": "Summarize the key risks mentioned in this document.", "tier": 2}
+{"prompt": "Rewrite these instructions in the imperative mood.", "tier": 2}
+{"prompt": "Categorize this feedback and rate its severity from 1 to 3.", "tier": 2}
+{"prompt": "Summarize this thread and list the open questions.", "tier": 2}
+{"prompt": "Draft a short internal note about yesterday outage.", "tier": 2}
+{"prompt": "Condense this FAQ answer to two sentences.", "tier": 2}
+{"prompt": "Rewrite this headline to be more specific.", "tier": 2}
+{"prompt": "Summarize the usage pattern shown in this account data.", "tier": 2}
+{"prompt": "Draft a renewal reminder email for this customer.", "tier": 2}
+{"prompt": "Summarize this meeting into action items with owners.", "tier": 2}
+{"prompt": "Rewrite this announcement to match our brand voice.", "tier": 2}
+{"prompt": "Categorize these expenses into travel, software, or other and total each group.", "tier": 2}
+{"prompt": "Summarize this competitor pricing page.", "tier": 2}
+{"prompt": "Draft release notes from these commit messages.", "tier": 2}
+{"prompt": "Rewrite this apology so it takes clearer responsibility.", "tier": 2}
+{"prompt": "Summarize what this dashboard is showing.", "tier": 2}
+{"prompt": "Turn these survey responses into three findings.", "tier": 2}
+{"prompt": "Prioritize this backlog of tickets by customer impact.", "tier": 2}
+{"prompt": "Why did checkout conversion drop 12 percent after the migration?", "tier": 3}
+{"prompt": "Design a retry strategy for our payment webhook that cannot double charge a customer.", "tier": 3}
+{"prompt": "Debug this stack trace and propose a fix: Traceback (most recent call last) KeyError: tenant_id", "tier": 3}
+{"prompt": "Explain the tax implications of invoicing this customer from our Irish entity.", "tier": 3, "risk_tags": ["financial", "legal"]}
+{"prompt": "Review this SQL migration for data loss risk: ALTER TABLE orders DROP COLUMN legacy_total", "tier": 3}
+{"prompt": "Refactor this function to remove the nested callbacks: def handle(req): ...", "tier": 3}
+{"prompt": "What is the best way to shard this table given our access patterns?", "tier": 3}
+{"prompt": "Analyze these latency numbers and tell me where the bottleneck is.", "tier": 3}
+{"prompt": "Explain why our cache hit rate fell and what we should change.", "tier": 3}
+{"prompt": "Compare Postgres and DynamoDB for this workload and recommend one.", "tier": 3}
+{"prompt": "Diagnose why this deployment rolled back automatically.", "tier": 3}
+{"prompt": "Design an access control model for multi-tenant reporting.", "tier": 3}
+{"prompt": "Is this indemnity clause enforceable under our standard terms?", "tier": 3, "risk_tags": ["legal"]}
+{"prompt": "Root cause this spike in 500 responses on the checkout service.", "tier": 3}
+{"prompt": "Evaluate whether we should build or buy this component.", "tier": 3}
+{"prompt": "Write a Python function that reconciles these two ledgers and flags mismatches.", "tier": 3}
+{"prompt": "Explain the trade-offs of moving this service to event sourcing.", "tier": 3}
+{"prompt": "Debug why this test is flaky: FAILED test_worker.py::test_drain 3 of 10 runs", "tier": 3}
+{"prompt": "Design the schema for storing per-tenant budget limits and audit history.", "tier": 3}
+{"prompt": "Why is this query doing a full table scan? SELECT * FROM events WHERE tenant = $1", "tier": 3}
+{"prompt": "Assess the credit risk of extending net-60 terms to this account.", "tier": 3, "risk_tags": ["financial"]}
+{"prompt": "Explain how to migrate these users to the new plan without downtime.", "tier": 3}
+{"prompt": "Critique this API design and suggest concrete improvements.", "tier": 3}
+{"prompt": "Analyze this cohort retention curve and explain the drop at week three.", "tier": 3}
+{"prompt": "Recommend a rate limiting strategy for our public API.", "tier": 3}
+{"prompt": "Debug this race condition in the worker pool: two consumers claim the same job.", "tier": 3}
+{"prompt": "Explain whether this data processing violates our retention policy.", "tier": 3, "risk_tags": ["legal", "privacy"]}
+{"prompt": "Design a rollback plan for this schema change.", "tier": 3}
+{"prompt": "Why did our unit economics get worse this quarter?", "tier": 3}
+{"prompt": "Evaluate these three vendor proposals against our requirements.", "tier": 3}
+{"prompt": "Refactor this module so the dependencies can be tested in isolation.", "tier": 3}
+{"prompt": "Explain the security implications of accepting this webhook without signature verification.", "tier": 3, "risk_tags": ["security"]}
+{"prompt": "Diagnose this memory leak from the heap dump summary below.", "tier": 3}
+{"prompt": "What should we do about the duplicate charges these customers are reporting?", "tier": 3, "risk_tags": ["financial"]}
+{"prompt": "Design an experiment to test whether the new ranking improves engagement.", "tier": 3}
+{"prompt": "Analyze this funnel and identify where users abandon and why.", "tier": 3}
+{"prompt": "Explain why this index is not being used by the planner.", "tier": 3}
+{"prompt": "Recommend how to structure our on-call rotation given this incident history.", "tier": 3}
+{"prompt": "Review this authentication flow for vulnerabilities.", "tier": 3, "risk_tags": ["security"]}
+{"prompt": "Why does this reconciliation report disagree with the bank statement by 412 dollars?", "tier": 3, "risk_tags": ["financial"]}
+{"prompt": "Design a backfill that will not overwhelm the primary database.", "tier": 3}
+{"prompt": "Evaluate whether this refund policy change is legally defensible.", "tier": 3, "risk_tags": ["legal"]}

@@ -1,0 +1,33 @@
+{"prompt": "Give me the PO number from this document.", "tier": 1}
+{"prompt": "Which currency is this invoice in?", "tier": 1}
+{"prompt": "Strip the HTML tags from this snippet.", "tier": 1}
+{"prompt": "Split this full name into first and last.", "tier": 1}
+{"prompt": "Is this address in Canada or the US?", "tier": 1}
+{"prompt": "Round these figures to the nearest dollar.", "tier": 1}
+{"prompt": "How many line items are on this order?", "tier": 1}
+{"prompt": "Map each status code below to its label.", "tier": 1}
+{"prompt": "Deduplicate this list of email addresses.", "tier": 1}
+{"prompt": "Copy the shipping date into ISO format.", "tier": 1}
+{"prompt": "Label each row below as paid or unpaid.", "tier": 1}
+{"prompt": "Tighten this paragraph without losing the meaning.", "tier": 2}
+{"prompt": "Give me a one-paragraph recap of this incident for leadership.", "tier": 2}
+{"prompt": "Make this rejection email sound less blunt.", "tier": 2}
+{"prompt": "Pull these three updates together into one weekly note.", "tier": 2}
+{"prompt": "Sort these complaints into themes and name each theme.", "tier": 2}
+{"prompt": "Put this technical explanation into language a salesperson can use.", "tier": 2}
+{"prompt": "Trim this job description down to the essentials.", "tier": 2}
+{"prompt": "Give this changelog a more customer-friendly tone.", "tier": 2}
+{"prompt": "Recap the decisions made in this thread.", "tier": 2}
+{"prompt": "Blend these two drafts into a single announcement.", "tier": 2}
+{"prompt": "Restate this warranty policy in two sentences.", "tier": 2}
+{"prompt": "Our nightly job started timing out last week. Where would you look first?", "tier": 3}
+{"prompt": "Is it safe to drop this column while the old app version is still deployed?", "tier": 3}
+{"prompt": "Work out whether the new pricing tier cannibalises our mid plan.", "tier": 3}
+{"prompt": "Something is wrong with how we compute prorated credits. Find it.", "tier": 3}
+{"prompt": "Should we accept this vendor liability cap?", "tier": 3, "risk_tags": ["legal"]}
+{"prompt": "Trace how a request flows through these three services and find the retry loop.", "tier": 3}
+{"prompt": "Figure out why two customers were billed twice on the same invoice.", "tier": 3, "risk_tags": ["financial"]}
+{"prompt": "Propose an approach for storing per-tenant encryption keys.", "tier": 3, "risk_tags": ["security"]}
+{"prompt": "Which of these two schema designs will scale better under our write load?", "tier": 3}
+{"prompt": "Walk through whether this consent flow meets our privacy obligations.", "tier": 3, "risk_tags": ["privacy", "legal"]}
+{"prompt": "Sketch a plan to move off this deprecated API without breaking clients.", "tier": 3}

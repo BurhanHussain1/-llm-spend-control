@@ -234,6 +234,17 @@ for the cheap model's context gets upgraded, unavailable provider falls back cle
 **Done when:** `python -m eval.classifier_eval` prints accuracy and misroute costs.
 **Commit:** `feat: complexity classifier and tier-based model router`
 
+> **Result, recorded honestly.** 98.4% on the calibration set, **48.5% on a
+> 33-prompt holdout written afterwards in different phrasing**. The gap is the
+> point: the calibration figure measures fit, not generalization. The holdout also
+> caught a structural defect — an unrecognised prompt defaulted to tier 1, the
+> cheapest model, so 63.6% of holdout prompts were under-routed. Defaulting to
+> tier 2 instead cut under-routing to 21.2% and converted the rest into harmless
+> over-spending. Quote 48.5% in the case study, never 98.4%.
+>
+> The takeaway for Phase 6: a ~50% classifier is not what makes this system safe.
+> The feature overrides, the risk-tag floors, and the shadow verification are.
+
 ---
 
 ## Phase 5 — Wire the gateway end to end (~45 min)

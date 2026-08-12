@@ -1,0 +1,53 @@
+# Tier-to-model mapping and the override rules that outrank the classifier.
+#
+# Within each tier, models are listed in preference order and the router takes
+# the first one that is actually reachable. Mock models come last on purpose:
+# they are the fallback when no provider credentials are configured, which is
+# what makes the test suite and the workload simulation run offline.
+
+tiers:
+  1:
+    - gpt-4o-mini
+    - claude-haiku-4-5
+    - llama3.1:8b
+    - mock-cheap
+  2:
+    - claude-sonnet-5
+    - gpt-4o
+    - mock-mid
+  3:
+    - claude-opus-5
+    - mock-strong
+
+# Features where correctness matters more than cost, whatever the prompt looks
+# like. These exist because the classifier reads the text of a request and has no
+# idea what the answer will be used for -- a one-line question about a refund is
+# textually trivial and financially consequential.
+feature_overrides:
+  payment_dispute: 3
+  refund_decision: 3
+  legal_review: 3
+  contract_analysis: 3
+  incident_postmortem: 3
+  # Summaries shown directly to customers get a mid-tier floor: cheap models
+  # produce something readable but flat, and this text is customer-facing.
+  customer_summary: 2
+
+# Risk tags the caller can attach to any request. Applied as a floor, so a tag
+# can raise a tier but never lower one.
+#
+# These are the tags we expect, listed for documentation. The rule is simpler
+# than the list suggests: **any** risk tag escalates a request to tier 3, whether
+# it appears here or not. That is deliberate. A caller who misspells 'legal' as
+# 'legaal' has still told us the request is sensitive, and a typo must not
+# silently route a legal question to the cheapest model.
+#
+# The corollary is that a tag cannot carry a tier-2 floor -- it would never take
+# effect. An earlier version of this file listed 'customer-facing: 2'; it was
+# dead config and has been removed rather than left in to look thorough.
+risk_tag_overrides:
+  legal: 3
+  financial: 3
+  security: 3
+  privacy: 3
+  medical: 3
