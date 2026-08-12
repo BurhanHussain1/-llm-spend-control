@@ -300,9 +300,14 @@ class Gateway:
             latency_ms=retry.latency_ms,
             cost_usd=cost,
             estimated_cost_usd=estimate.cost_usd,
-            # No counterfactual on an escalation: this *is* effectively the
-            # baseline model, and claiming savings on it would be double counting.
-            baseline_cost_usd=cost,
+            # No counterfactual on this row. The request's counterfactual -- one
+            # call to the strong model -- is already recorded on the primary row,
+            # so repeating it here would count the same baseline twice and make an
+            # escalated request look free. Actual spend for such a request is
+            # therefore cheap + strong against a baseline of strong alone, which
+            # correctly shows escalation as costing *more* than routing straight
+            # to the strong model.
+            baseline_cost_usd=0.0,
             prompt=request.prompt_text(),
         )
         self._ledger_reserve(repo, request, estimate.cost_usd, event.id)

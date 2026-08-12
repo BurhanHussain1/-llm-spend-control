@@ -219,6 +219,192 @@ class Repository:
             query = query.where(UsageEvent.created_at >= since)
         return {status: int(count) for status, count in self.session.execute(query)}
 
+    # --- reporting aggregates ------------------------------------------------
+    #
+    # `kind` matters in all of these. Only `primary` rows carry a counterfactual,
+    # so the baseline is summed over those alone; escalation and shadow rows are
+    # real spend with no baseline of their own.
+
+    def spend_by(
+        self, column: str, since: datetime | None = None
+    ) -> list[tuple[str, int, float]]:
+        """Spend grouped by team, feature, model, or kind: (label, requests, cost)."""
+        columns = {
+            "team": UsageEvent.team_id,
+            "feature": UsageEvent.feature,
+            "model": UsageEvent.model,
+            "provider": UsageEvent.provider,
+            "kind": UsageEvent.kind,
+        }
+        if column not in columns:
+            raise ValueError(f"cannot group by {column!r}; try one of {sorted(columns)}")
+        target = columns[column]
+
+        query = (
+            select(target, func.count(UsageEvent.id), func.sum(UsageEvent.cost_usd))
+            .where(UsageEvent.status == BILLABLE_STATUS)
+            .group_by(target)
+            .order_by(func.sum(UsageEvent.cost_usd).desc())
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+
+        return [
+            (str(label), int(count), _money(cost or 0.0))
+            for label, count, cost in self.session.execute(query)
+        ]
+
+    def spend_by_kind(self, since: datetime | None = None) -> dict[str, float]:
+        """Cost split across primary routing, escalation, and verification."""
+        return {
+            label: cost for label, _count, cost in self.spend_by("kind", since)
+        }
+
+    def baseline_total(self, since: datetime | None = None) -> float:
+        """The counterfactual: every request priced on the baseline model.
+
+        Summed over ``primary`` rows only, so each request contributes its
+        counterfactual exactly once.
+        """
+        query = select(func.coalesce(func.sum(UsageEvent.baseline_cost_usd), 0.0)).where(
+            UsageEvent.status == BILLABLE_STATUS, UsageEvent.kind == "primary"
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+        return _money(self.session.execute(query).scalar_one())
+
+    def daily_spend(
+        self, since: datetime | None = None
+    ) -> list[tuple[str, float, float]]:
+        """Per-day (date, actual cost, baseline cost) for the savings chart."""
+        day = func.date(UsageEvent.created_at)
+        query = (
+            select(
+                day,
+                func.sum(UsageEvent.cost_usd),
+                func.sum(UsageEvent.baseline_cost_usd),
+            )
+            .where(UsageEvent.status == BILLABLE_STATUS)
+            .group_by(day)
+            .order_by(day)
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+
+        return [
+            (str(date), _money(actual or 0.0), _money(baseline or 0.0))
+            for date, actual, baseline in self.session.execute(query)
+        ]
+
+    def most_expensive(self, limit: int = 10) -> list[UsageEvent]:
+        """The costliest individual requests -- usually where the savings hide."""
+        query = (
+            select(UsageEvent)
+            .where(UsageEvent.status == BILLABLE_STATUS)
+            .order_by(UsageEvent.cost_usd.desc())
+            .limit(limit)
+        )
+        return list(self.session.execute(query).scalars())
+
+    def tier_distribution(self, since: datetime | None = None) -> dict[int, int]:
+        """How many routed requests landed in each tier."""
+        query = (
+            select(UsageEvent.tier, func.count(UsageEvent.id))
+            .where(UsageEvent.status == BILLABLE_STATUS, UsageEvent.kind == "primary")
+            .group_by(UsageEvent.tier)
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+        return {int(tier): int(count) for tier, count in self.session.execute(query)}
+
+    def latency_samples(
+        self, since: datetime | None = None
+    ) -> list[tuple[str, int]]:
+        """(model, latency_ms) pairs. Percentiles are computed in reporting.py.
+
+        SQLite has no percentile function, so the rows come back raw rather than
+        the query pretending to aggregate something it cannot.
+        """
+        query = select(UsageEvent.model, UsageEvent.latency_ms).where(
+            UsageEvent.status == BILLABLE_STATUS, UsageEvent.latency_ms > 0
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+        return [(str(model), int(latency)) for model, latency in self.session.execute(query)]
+
+    def outcomes_by_provider(
+        self, since: datetime | None = None
+    ) -> list[tuple[str, str, int]]:
+        """(provider, status, count) -- the source of the per-provider error rate."""
+        query = (
+            select(UsageEvent.provider, UsageEvent.status, func.count(UsageEvent.id))
+            .group_by(UsageEvent.provider, UsageEvent.status)
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+        return [
+            (str(provider), str(status), int(count))
+            for provider, status, count in self.session.execute(query)
+        ]
+
+    def estimate_accuracy(
+        self, since: datetime | None = None
+    ) -> list[tuple[float, float]]:
+        """(estimated, actual) cost pairs for rows where both are known."""
+        query = select(UsageEvent.estimated_cost_usd, UsageEvent.cost_usd).where(
+            UsageEvent.status == BILLABLE_STATUS, UsageEvent.cost_usd > 0
+        )
+        if since is not None:
+            query = query.where(UsageEvent.created_at >= since)
+        return [
+            (float(estimated), float(actual))
+            for estimated, actual in self.session.execute(query)
+        ]
+
+    def verification_counts(self, since: datetime | None = None) -> dict[str, int]:
+        """Quality checks split into passed, failed, and not run.
+
+        ``not_run`` is kept separate rather than folded into failures: a check
+        that could not run is not evidence of a bad answer.
+        """
+        query = select(RoutingMiss.passed, func.count(RoutingMiss.id)).group_by(
+            RoutingMiss.passed
+        )
+        if since is not None:
+            query = query.where(RoutingMiss.created_at >= since)
+
+        counts = {"passed": 0, "failed": 0, "not_run": 0}
+        for passed, count in self.session.execute(query):
+            key = "not_run" if passed is None else ("passed" if passed else "failed")
+            counts[key] = int(count)
+        return counts
+
+    def routing_misses(self, limit: int = 20) -> list[RoutingMiss]:
+        """Checks the cheap model actually failed, newest first."""
+        query = (
+            select(RoutingMiss)
+            .where(RoutingMiss.passed.is_(False))
+            .order_by(RoutingMiss.created_at.desc(), RoutingMiss.id.desc())
+            .limit(limit)
+        )
+        return list(self.session.execute(query).scalars())
+
+    def judges_used(self, since: datetime | None = None) -> list[str]:
+        """Which judges produced the stored verdicts.
+
+        Surfaced because a pass rate means different things depending on what did
+        the judging, and the dashboard has to say which one it was.
+        """
+        query = select(RoutingMiss.reason).where(RoutingMiss.passed.isnot(None))
+        if since is not None:
+            query = query.where(RoutingMiss.created_at >= since)
+
+        judges = set()
+        for (reason,) in self.session.execute(query):
+            if reason.startswith("["):
+                judges.add(reason[1 : reason.find("]")])
+        return sorted(judges)
+
     def recent_events(self, limit: int = 50) -> list[UsageEvent]:
         query = (
             select(UsageEvent).order_by(UsageEvent.created_at.desc(), UsageEvent.id.desc()).limit(limit)
