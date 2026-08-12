@@ -252,8 +252,15 @@ Build:
 - `GET /health` — DB, Redis, and provider reachability.
 - Response includes `routing_reason` and `budget_status` so a human can read the decision.
 
-Tests: happy path with the mock provider; a blocked request writes no usage row but does
-write a ledger entry; a provider failure refunds the reservation; the response schema is stable.
+Tests: happy path with the mock provider; a blocked request writes a `blocked` usage row
+at zero cost plus a ledger entry; a provider failure refunds the reservation; the response
+schema is stable.
+
+> **Changed during Phase 2.** This originally said a blocked request writes *no* usage row.
+> It now writes one with `status = "blocked"` and `cost_usd = 0`. Without rows for failed
+> attempts there is no way to report a block rate or an error rate by provider, and an audit
+> log that only records successes is not much of an audit log. Spend queries filter on
+> `status = "ok"`, so blocked and errored rows never inflate a total.
 
 **Done when:** `curl` a request and see the model choice, cost, and budget state come back.
 **Commit:** `feat: unified chat gateway endpoint`
